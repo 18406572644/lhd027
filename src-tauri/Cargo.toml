@@ -1,0 +1,23 @@
+[package]
+name = "weather-clock"
+version = "1.0.0"
+description = "A beautiful weather clock desktop application"
+authors = ["you"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "1.5", features = [] }
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tauri = { version = "1.6", features = [
+  "window-all",
+  "notification-all",
+  "global-shortcut-all",
+  "shell-open",
+] }
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

@@ -1,0 +1,7 @@
+{
+  "title": "Weather Clock",
+  "identifier": "com.weather.clock",
+  "short_description": "A beautiful weather and clock desktop application",
+  "long_description": "Weather Clock is a lightweight desktop application that displays real-time weather, forecasts, alarms, and a floating clock widget.",
+  "frontend_dist": ["../dist"]
+}
