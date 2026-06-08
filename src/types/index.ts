@@ -47,3 +47,64 @@ export interface Alarm {
 }
 
 export type ThemeMode = 'light' | 'dark' | 'auto'
+
+export type WidgetType = 'clock' | 'weather' | 'alarm' | 'todo' | 'calendar'
+
+export type ClockMode = 'digital' | 'analog'
+export type WeatherMode = 'current' | 'forecast'
+
+export interface WidgetPosition {
+  x: number
+  y: number
+}
+
+export interface WidgetSize {
+  width: number
+  height: number
+}
+
+export interface WidgetStyle {
+  backgroundColor: string
+  textColor: string
+  accentColor: string
+  opacity: number
+  borderRadius: number
+  fontSize: 'small' | 'medium' | 'large'
+}
+
+export interface WidgetConfig {
+  clockMode?: ClockMode
+  weatherMode?: WeatherMode
+  showSeconds?: boolean
+  showDate?: boolean
+  showForecastDays?: number
+}
+
+export interface Widget {
+  id: string
+  type: WidgetType
+  title: string
+  position: WidgetPosition
+  size: WidgetSize
+  style: WidgetStyle
+  config: WidgetConfig
+  zIndex: number
+}
+
+export interface WidgetLibraryItem {
+  type: WidgetType
+  title: string
+  description: string
+  icon: string
+  defaultSize: WidgetSize
+  defaultConfig: WidgetConfig
+}
+
+export interface Todo {
+  id: string
+  title: string
+  completed: boolean
+  createdAt: number
+  dueDate?: string
+  priority: 'low' | 'medium' | 'high'
+}

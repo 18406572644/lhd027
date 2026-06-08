@@ -1,4 +1,4 @@
-import type { City } from '@/types'
+import type { City, WidgetLibraryItem } from '@/types'
 
 export const CITIES: City[] = [
   { id: '1', name: '北京', province: '北京市', adcode: '110000' },
@@ -35,4 +35,80 @@ export const STORAGE_KEYS = {
   THEME: 'weather_clock_theme',
   ALARMS: 'weather_clock_alarms',
   FLOAT_WINDOW: 'weather_clock_float_window',
+  WIDGETS: 'weather_clock_widgets',
+  TODOS: 'weather_clock_todos',
+}
+
+export const WIDGET_LIBRARY: WidgetLibraryItem[] = [
+  {
+    type: 'clock',
+    title: '时钟',
+    description: '数字时钟或模拟时钟显示',
+    icon: '⏰',
+    defaultSize: { width: 280, height: 180 },
+    defaultConfig: {
+      clockMode: 'digital',
+      showSeconds: true,
+      showDate: true
+    }
+  },
+  {
+    type: 'weather',
+    title: '天气',
+    description: '当前天气或未来预报',
+    icon: '🌤️',
+    defaultSize: { width: 280, height: 200 },
+    defaultConfig: {
+      weatherMode: 'current',
+      showForecastDays: 3
+    }
+  },
+  {
+    type: 'alarm',
+    title: '闹钟',
+    description: '显示下次闹钟倒计时',
+    icon: '🔔',
+    defaultSize: { width: 280, height: 140 },
+    defaultConfig: {}
+  },
+  {
+    type: 'todo',
+    title: '待办',
+    description: '今日待办事项列表',
+    icon: '📝',
+    defaultSize: { width: 320, height: 280 },
+    defaultConfig: {}
+  },
+  {
+    type: 'calendar',
+    title: '日历',
+    description: '月历视图显示',
+    icon: '📅',
+    defaultSize: { width: 320, height: 280 },
+    defaultConfig: {}
+  }
+]
+
+export const DEFAULT_WIDGET_STYLE = {
+  backgroundColor: 'rgba(255, 255, 255, 0.85)',
+  textColor: '#1e293b',
+  accentColor: '#667eea',
+  opacity: 0.95,
+  borderRadius: 16,
+  fontSize: 'medium' as const
+}
+
+export const WIDGET_RESIZE_HANDLE_SIZE = 12
+export const WIDGET_MIN_SIZE = { width: 150, height: 100 }
+
+export const PRIORITY_COLORS = {
+  low: '#22c55e',
+  medium: '#eab308',
+  high: '#ef4444'
+}
+
+export const PRIORITY_LABELS = {
+  low: '低',
+  medium: '中',
+  high: '高'
 }

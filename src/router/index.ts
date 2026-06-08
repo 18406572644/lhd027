@@ -10,6 +10,11 @@ const routes = [
     path: '/float',
     name: 'float',
     component: () => import('@/views/FloatWindow.vue')
+  },
+  {
+    path: '/widgets',
+    name: 'widgets',
+    component: () => import('@/views/WidgetLibrary.vue')
   }
 ]
 

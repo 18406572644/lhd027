@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container" :class="{ 'dark-mode': isDark }">
+  <div class="app-container" :class="{ 'dark-mode': isDark, 'widgets-mode': showWidgets }">
     <header class="app-header" @mousedown="startDrag">
       <div class="header-left">
         <h1 class="app-title">
@@ -9,6 +9,26 @@
         <CitySelector />
       </div>
       <div class="header-right">
+        <el-button 
+          link 
+          size="small"
+          @click.stop="toggleWidgetsMode"
+          :class="{ 'active': showWidgets }"
+        >
+          <el-icon><Grid /></el-icon>
+          小组件
+          <span v-if="widgetStore.widgets.length > 0" class="widget-badge">
+            {{ widgetStore.widgets.length }}
+          </span>
+        </el-button>
+        <el-button 
+          link 
+          size="small"
+          @click.stop="goToWidgetLibrary"
+        >
+          <el-icon><Collection /></el-icon>
+          小组件库
+        </el-button>
         <el-button 
           link 
           size="small"
@@ -27,32 +47,63 @@
     </header>
 
     <main class="app-main">
-      <ClockDisplay />
-      <WeatherCard />
-      <ForecastPanel />
+      <div v-if="!showWidgets" class="main-content">
+        <ClockDisplay />
+        <WeatherCard />
+        <ForecastPanel />
+        
+        <el-tabs v-model="activeTab" class="main-tabs">
+          <el-tab-pane label="闹钟" name="alarm">
+            <AlarmPanel />
+          </el-tab-pane>
+          <el-tab-pane label="设置" name="settings">
+            <SettingsPanel />
+          </el-tab-pane>
+        </el-tabs>
+      </div>
       
-      <el-tabs v-model="activeTab" class="main-tabs">
-        <el-tab-pane label="闹钟" name="alarm">
-          <AlarmPanel />
-        </el-tab-pane>
-        <el-tab-pane label="设置" name="settings">
-          <SettingsPanel />
-        </el-tab-pane>
-      </el-tabs>
+      <div v-else class="widgets-area" @click="handleAreaClick">
+        <div class="widgets-empty" v-if="widgetStore.widgets.length === 0">
+          <div class="empty-icon">🧩</div>
+          <div class="empty-title">暂无小组件</div>
+          <div class="empty-desc">点击顶部"小组件库"按钮添加小组件</div>
+          <el-button type="primary" @click="goToWidgetLibrary">
+            <el-icon><Plus /></el-icon>
+            添加小组件
+          </el-button>
+        </div>
+        
+        <WidgetContainer
+          v-for="widget in widgetStore.widgets"
+          :key="widget.id"
+          :widget="widget"
+          @open-settings="openWidgetSettings"
+        />
+      </div>
     </main>
 
     <footer class="app-footer">
-      <span>Powered by Tauri + Vue3 + Element Plus</span>
+      <span v-if="!showWidgets">Powered by Tauri + Vue3 + Element Plus</span>
+      <span v-else>拖拽移动小组件 · 边缘拖动调整大小 · 点击设置修改样式</span>
     </footer>
+    
+    <WidgetSettingsDialog 
+      v-model="settingsDialogVisible" 
+      :widget="selectedWidget"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useAlarmStore } from '@/stores/alarm'
-import { invoke } from '@tauri-apps/api/tauri'
+import { useWidgetStore } from '@/stores/widget'
+import { useTodoStore } from '@/stores/todo'
 import { appWindow } from '@tauri-apps/api/window'
+import { Grid, Collection, Refresh, Minus, Close, Plus } from '@element-plus/icons-vue'
+import type { Widget } from '@/types'
 
 import ClockDisplay from '@/components/ClockDisplay.vue'
 import WeatherCard from '@/components/WeatherCard.vue'
@@ -60,12 +111,39 @@ import ForecastPanel from '@/components/ForecastPanel.vue'
 import CitySelector from '@/components/CitySelector.vue'
 import AlarmPanel from '@/components/AlarmPanel.vue'
 import SettingsPanel from '@/components/SettingsPanel.vue'
+import WidgetContainer from '@/components/WidgetContainer.vue'
+import WidgetSettingsDialog from '@/components/WidgetSettingsDialog.vue'
 
+const router = useRouter()
 const appStore = useAppStore()
 const alarmStore = useAlarmStore()
+const widgetStore = useWidgetStore()
+const todoStore = useTodoStore()
 const isDark = computed(() => appStore.isDark)
 
 const activeTab = ref('alarm')
+const showWidgets = ref(false)
+const settingsDialogVisible = ref(false)
+const selectedWidget = ref<Widget | null>(null)
+
+const toggleWidgetsMode = () => {
+  showWidgets.value = !showWidgets.value
+}
+
+const goToWidgetLibrary = () => {
+  router.push('/widgets')
+}
+
+const openWidgetSettings = (widget: Widget) => {
+  selectedWidget.value = widget
+  settingsDialogVisible.value = true
+}
+
+const handleAreaClick = (e: MouseEvent) => {
+  if (e.target === e.currentTarget) {
+    widgetStore.activeWidgetId = null
+  }
+}
 
 const startDrag = async (e: MouseEvent) => {
   if ((e.target as HTMLElement).closest('button, .el-select, input')) return
@@ -100,6 +178,8 @@ onMounted(() => {
   appStore.loadFromStorage()
   alarmStore.loadAlarms()
   alarmStore.startChecking()
+  widgetStore.loadWidgets()
+  todoStore.loadTodos()
   appStore.fetchWeather()
   
   setInterval(() => {
@@ -162,9 +242,28 @@ onMounted(() => {
       
       .el-button {
         color: #64748b;
+        position: relative;
         
         &:hover {
           color: #667eea;
+        }
+        
+        &.active {
+          color: #667eea;
+          background: rgba(102, 126, 234, 0.1);
+          border-radius: 8px;
+        }
+        
+        .widget-badge {
+          position: absolute;
+          top: -4px;
+          right: -4px;
+          background: #667eea;
+          color: white;
+          font-size: 10px;
+          padding: 1px 5px;
+          border-radius: 10px;
+          font-weight: 600;
         }
       }
     }
@@ -173,7 +272,48 @@ onMounted(() => {
   .app-main {
     flex: 1;
     padding: 20px;
-    overflow-y: auto;
+    overflow: hidden;
+    position: relative;
+    
+    .main-content {
+      height: 100%;
+      overflow-y: auto;
+    }
+    
+    .widgets-area {
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      
+      .widgets-empty {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        
+        .empty-icon {
+          font-size: 64px;
+          opacity: 0.5;
+        }
+        
+        .empty-title {
+          font-size: 18px;
+          font-weight: 600;
+          color: #64748b;
+        }
+        
+        .empty-desc {
+          font-size: 14px;
+          color: #94a3b8;
+          margin-bottom: 8px;
+        }
+      }
+    }
     
     .main-tabs {
       margin-top: 20px;
@@ -217,6 +357,25 @@ onMounted(() => {
           &:hover {
             color: #a5b4fc;
           }
+          
+          &.active {
+            color: #a5b4fc;
+            background: rgba(165, 180, 252, 0.15);
+          }
+        }
+      }
+    }
+    
+    .app-main {
+      .widgets-area {
+        .widgets-empty {
+          .empty-title {
+            color: #94a3b8;
+          }
+          
+          .empty-desc {
+            color: #64748b;
+          }
         }
       }
     }
@@ -244,6 +403,17 @@ onMounted(() => {
     
     :deep(.el-tabs__nav-wrap::after) {
       background-color: rgba(148, 163, 184, 0.1);
+    }
+  }
+  
+  &.widgets-mode {
+    .app-main {
+      padding: 0;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    }
+    
+    &.dark-mode .app-main {
+      background: linear-gradient(135deg, rgba(165, 180, 252, 0.08) 0%, rgba(196, 181, 253, 0.08) 100%);
     }
   }
 }

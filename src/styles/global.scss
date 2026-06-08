@@ -248,4 +248,137 @@ html.dark {
   .el-skeleton__item {
     background: rgba(148, 163, 184, 0.1);
   }
+  
+  .el-tabs__item {
+    color: #94a3b8;
+    
+    &.is-active {
+      color: #a5b4fc;
+    }
+    
+    &:hover {
+      color: #a5b4fc;
+    }
+  }
+  
+  .el-tabs__active-bar {
+    background-color: #a5b4fc;
+  }
+  
+  .el-tabs__nav-wrap::after {
+    background-color: rgba(148, 163, 184, 0.1);
+  }
+  
+  .el-color-picker__panel {
+    background: #1e293b;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+  }
+  
+  .el-slider__runway {
+    background: rgba(148, 163, 184, 0.2);
+  }
+  
+  .el-slider__bar {
+    background: #667eea;
+  }
+  
+  .el-slider__button {
+    border-color: #667eea;
+  }
+  
+  .el-slider__input .el-input__wrapper {
+    background: rgba(30, 41, 59, 0.8);
+    box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.2) inset;
+    
+    .el-input__inner {
+      color: #f1f5f9;
+    }
+  }
+}
+
+.widget-font-small {
+  font-size: 12px;
+}
+
+.widget-font-medium {
+  font-size: 14px;
+}
+
+.widget-font-large {
+  font-size: 16px;
+}
+
+.widget-content {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.widget-content * {
+  box-sizing: border-box;
+}
+
+.widget-content :deep(.el-input__wrapper) {
+  padding: 4px 10px;
+  box-shadow: 0 0 0 1px rgba(100, 116, 139, 0.2) inset;
+}
+
+.widget-content :deep(.el-input__inner) {
+  height: 28px;
+  font-size: 13px;
+}
+
+.widget-content :deep(.el-button) {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.widget-content :deep(.el-checkbox__label) {
+  font-size: 13px;
+}
+
+.widget-content :deep(.el-select__wrapper) {
+  min-height: 28px;
+  height: 28px;
+}
+
+.widget-content :deep(.el-select-input) {
+  height: 28px;
+  font-size: 12px;
+}
+
+html.dark .widget-content :deep(.el-input__wrapper) {
+  background: rgba(30, 41, 59, 0.6);
+  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.2) inset;
+  
+  .el-input__inner {
+    color: #f1f5f9;
+    
+    &::placeholder {
+      color: #64748b;
+    }
+  }
+}
+
+html.dark .widget-content :deep(.el-select__wrapper) {
+  background: rgba(30, 41, 59, 0.6);
+  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.2) inset;
+  
+  .el-select-input {
+    color: #f1f5f9;
+  }
+}
+
+html.dark .widget-content :deep(.el-checkbox__label) {
+  color: #e2e8f0;
+}
+
+html.dark .widget-content :deep(.el-checkbox__inner) {
+  background-color: rgba(30, 41, 59, 0.8);
+  border-color: rgba(148, 163, 184, 0.4);
+}
+
+html.dark .widget-content :deep(.el-checkbox.is-checked .el-checkbox__inner) {
+  background-color: #667eea;
+  border-color: #667eea;
 }
