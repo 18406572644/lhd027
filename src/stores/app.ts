@@ -128,11 +128,12 @@ export const useAppStore = defineStore('app', () => {
       }
 
       lastUpdate.value = Date.now()
-    } catch (error) {
+    } catch (error: any) {
       console.error('获取天气数据异常，启用模拟数据:', error)
       currentWeather.value = getMockCurrentWeather()
       forecast.value = getMockForecast()
       hourlyTemperatures.value = generateHourlyTemperatures()
+      
       useMockData.value = true
       lastUpdate.value = Date.now()
     } finally {

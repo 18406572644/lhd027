@@ -17,14 +17,18 @@
         </el-radio-button>
       </el-radio-group>
     </div>
-    <div class="chart-container">
-      <v-chart :option="chartOption" autoresize :theme="isDark ? 'dark' : undefined" />
+    <div class="chart-container" v-if="hasData">
+      <v-chart ref="chartRef" :option="chartOption" autoresize :theme="isDark ? 'dark' : undefined" style="width: 100%; height: 320px;" />
+    </div>
+    <div class="chart-loading" v-else>
+      <el-icon class="loading-icon"><Loading /></el-icon>
+      <span>数据加载中...</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useAppStore } from '@/stores/app'
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
@@ -69,6 +73,60 @@ const isDark = computed(() => appStore.isDark)
 
 const chartDataType = ref<'temperature' | 'precipitation' | 'hourly'>('temperature')
 const chartType = ref<'line' | 'bar'>('line')
+const chartRef = ref<InstanceType<typeof VChart> | null>(null)
+
+const hasData = computed(() => {
+  if (chartDataType.value === 'hourly') {
+    return appStore.hourlyTemperatures.length > 0
+  }
+  return appStore.forecast.length > 0
+})
+
+const triggerResize = () => {
+  nextTick(() => {
+    if (chartRef.value) {
+      try {
+        const chartInstance = (chartRef.value as any).getEchartsInstance?.()
+        if (chartInstance) {
+          chartInstance.resize()
+        }
+      } catch (e) {
+        console.warn('Chart resize failed:', e)
+      }
+    }
+  })
+}
+
+onMounted(() => {
+  nextTick(() => {
+    triggerResize()
+  })
+})
+
+onUnmounted(() => {
+  if (chartRef.value) {
+    try {
+      const chartInstance = (chartRef.value as any).getEchartsInstance?.()
+      if (chartInstance) {
+        chartInstance.dispose()
+      }
+    } catch (e) {
+      console.warn('Chart dispose failed:', e)
+    }
+  }
+})
+
+watch(chartDataType, () => {
+  triggerResize()
+})
+
+watch(chartType, () => {
+  triggerResize()
+})
+
+watch([() => appStore.forecast.length, () => appStore.hourlyTemperatures.length], () => {
+  triggerResize()
+})
 
 const textColor = computed(() => isDark.value ? '#94a3b8' : '#64748b')
 const splitLineColor = computed(() => isDark.value ? 'rgba(148, 163, 184, 0.1)' : 'rgba(100, 116, 139, 0.1)')
@@ -371,7 +429,42 @@ const chartOption = computed<ECOption>(() => {
   
   .chart-container {
     flex: 1;
-    min-height: 280px;
+    min-height: 320px;
+    height: 320px;
+    position: relative;
+  }
+  
+  .chart-loading {
+    flex: 1;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #64748b;
+    font-size: 14px;
+    
+    .loading-icon {
+      font-size: 32px;
+      color: #667eea;
+      animation: rotate 1.5s linear infinite;
+    }
+    
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  }
+  
+  :deep(.dark-mode) & {
+    .chart-loading {
+      color: #94a3b8;
+      
+      .loading-icon {
+        color: #a5b4fc;
+      }
+    }
   }
   
   :deep(.el-radio-button__inner) {

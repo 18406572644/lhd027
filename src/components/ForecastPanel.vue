@@ -117,7 +117,10 @@ const getWeatherIcon = (weather: string): string => {
   
   .chart-wrapper {
     width: 100%;
-    min-height: 340px;
+    min-height: 380px;
+    height: 380px;
+    display: flex;
+    flex-direction: column;
   }
   
   .forecast-item {
