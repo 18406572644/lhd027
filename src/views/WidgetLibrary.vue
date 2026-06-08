@@ -35,14 +35,14 @@
         <div class="stat-item">
           <span class="stat-icon">🪟</span>
           <span class="stat-label">已添加小组件</span>
-          <span class="stat-value">{{ widgetStore.widgets.length }}</span>
+          <span class="stat-value">{{ widgets.length }}</span>
         </div>
         <el-button 
           type="danger" 
           size="small" 
           text
           @click="clearAllWidgets"
-          v-if="widgetStore.widgets.length > 0"
+          v-if="widgets.length > 0"
         >
           <el-icon><Delete /></el-icon>
           清空全部
@@ -87,7 +87,7 @@
         </h2>
         <div class="active-widgets-list">
           <div 
-            v-for="widget in widgetStore.widgets" 
+            v-for="widget in widgets" 
             :key="widget.id"
             class="active-widget-item"
           >
@@ -120,6 +120,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useWidgetStore } from '@/stores/widget'
@@ -132,6 +133,7 @@ import { appWindow } from '@tauri-apps/api/window'
 const router = useRouter()
 const appStore = useAppStore()
 const widgetStore = useWidgetStore()
+const { widgets } = storeToRefs(widgetStore)
 
 const isDark = computed(() => appStore.isDark)
 
@@ -141,11 +143,11 @@ const getWidgetIcon = (type: WidgetType): string => {
 }
 
 const hasWidgetOfType = (type: WidgetType): boolean => {
-  return widgetStore.widgets.some(w => w.type === type)
+  return widgets.value.some(w => w.type === type)
 }
 
 const getWidgetCount = (type: WidgetType): number => {
-  return widgetStore.widgets.filter(w => w.type === type).length
+  return widgets.value.filter(w => w.type === type).length
 }
 
 const addWidget = (type: WidgetType) => {
@@ -204,7 +206,8 @@ const closeWindow = async () => {
 
 <style scoped lang="scss">
 .widget-library {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
   display: flex;
   flex-direction: column;
@@ -260,8 +263,10 @@ const closeWindow = async () => {
   
   .library-main {
     flex: 1;
+    min-height: 0;
     padding: 24px;
     overflow-y: auto;
+    overflow-x: hidden;
     
     .library-stats {
       display: flex;

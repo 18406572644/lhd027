@@ -17,8 +17,8 @@
         >
           <el-icon><Grid /></el-icon>
           小组件
-          <span v-if="widgetStore.widgets.length > 0" class="widget-badge">
-            {{ widgetStore.widgets.length }}
+          <span v-if="widgets.length > 0" class="widget-badge">
+            {{ widgets.length }}
           </span>
         </el-button>
         <el-button 
@@ -66,7 +66,7 @@
       </div>
       
       <div v-else class="widgets-area" @click="handleAreaClick">
-        <div class="widgets-empty" v-if="widgetStore.widgets.length === 0">
+        <div class="widgets-empty" v-if="widgets.length === 0">
           <div class="empty-icon">🧩</div>
           <div class="empty-title">暂无小组件</div>
           <div class="empty-desc">点击顶部"小组件库"按钮添加小组件</div>
@@ -77,7 +77,7 @@
         </div>
         
         <WidgetContainer
-          v-for="widget in widgetStore.widgets"
+          v-for="widget in widgets"
           :key="widget.id"
           :widget="widget"
           @open-settings="openWidgetSettings"
@@ -99,6 +99,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useAlarmStore } from '@/stores/alarm'
@@ -125,6 +126,7 @@ const alarmStore = useAlarmStore()
 const widgetStore = useWidgetStore()
 const todoStore = useTodoStore()
 const focusStore = useFocusStore()
+const { widgets, activeWidgetId } = storeToRefs(widgetStore)
 const isDark = computed(() => appStore.isDark)
 
 const activeTab = ref('alarm')
@@ -147,7 +149,7 @@ const openWidgetSettings = (widget: Widget) => {
 
 const handleAreaClick = (e: MouseEvent) => {
   if (e.target === e.currentTarget) {
-    widgetStore.activeWidgetId = null
+    activeWidgetId.value = null
   }
 }
 
