@@ -1,13 +1,15 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { City, CurrentWeather, ForecastDay, ThemeMode } from '@/types'
+import type { City, CurrentWeather, ForecastDay, ThemeMode, HourlyTemperature } from '@/types'
 import { CITIES, WEATHER_KEY, WEATHER_BASE_URL, STORAGE_KEYS } from '@/constants'
 import axios from 'axios'
+import dayjs from 'dayjs'
 
 export const useAppStore = defineStore('app', () => {
   const selectedCity = ref<City>(CITIES[0])
   const currentWeather = ref<CurrentWeather | null>(null)
   const forecast = ref<ForecastDay[]>([])
+  const hourlyTemperatures = ref<HourlyTemperature[]>([])
   const loading = ref(false)
   const lastUpdate = ref<number>(0)
   const useMockData = ref(false)
@@ -118,6 +120,8 @@ export const useAppStore = defineStore('app', () => {
         forecast.value = getMockForecast()
       }
 
+      hourlyTemperatures.value = generateHourlyTemperatures()
+
       useMockData.value = hasError
       if (hasError) {
         console.log('已启用模拟天气数据（API请求失败或Key无效）')
@@ -128,6 +132,7 @@ export const useAppStore = defineStore('app', () => {
       console.error('获取天气数据异常，启用模拟数据:', error)
       currentWeather.value = getMockCurrentWeather()
       forecast.value = getMockForecast()
+      hourlyTemperatures.value = generateHourlyTemperatures()
       useMockData.value = true
       lastUpdate.value = Date.now()
     } finally {
@@ -148,8 +153,9 @@ export const useAppStore = defineStore('app', () => {
   })
 
   const getMockForecast = (): ForecastDay[] => {
-    const days = ['今天', '明天', '后天', '周四', '周五']
-    const weathers = ['晴', '多云', '阴', '小雨', '晴']
+    const days = ['今天', '明天', '后天', '周四', '周五', '周六', '周日']
+    const weathers = ['晴', '多云', '阴', '小雨', '晴', '多云', '晴']
+    const precipitations = ['5', '15', '45', '80', '10', '25', '5']
     return days.map((day, i) => ({
       date: new Date(Date.now() + i * 86400000).toISOString().split('T')[0],
       week: day,
@@ -160,8 +166,39 @@ export const useAppStore = defineStore('app', () => {
       daywind: '东南风',
       nightwind: '东风',
       daypower: '3',
-      nightpower: '2'
+      nightpower: '2',
+      precipitation: precipitations[i]
     }))
+  }
+
+  const generateHourlyTemperatures = (): HourlyTemperature[] => {
+    const baseTemp = currentWeather.value ? parseInt(currentWeather.value.temperature) : 22
+    const hourlyData: HourlyTemperature[] = []
+    const now = dayjs()
+    
+    for (let i = 0; i < 24; i++) {
+      const time = now.add(i, 'hour')
+      const hour = time.hour()
+      let tempVariation = 0
+      
+      if (hour >= 6 && hour < 12) {
+        tempVariation = (hour - 6) * 1.5
+      } else if (hour >= 12 && hour < 16) {
+        tempVariation = 9 + (hour - 12) * 0.5
+      } else if (hour >= 16 && hour < 22) {
+        tempVariation = 11 - (hour - 16) * 1.8
+      } else {
+        tempVariation = -3 - Math.abs(hour - 2) * 0.8
+      }
+      
+      const temp = Math.round(baseTemp + tempVariation + (Math.random() - 0.5) * 2)
+      hourlyData.push({
+        time: time.format('HH:mm'),
+        temperature: temp
+      })
+    }
+    
+    return hourlyData
   }
 
   const loadFromStorage = () => {
@@ -190,6 +227,7 @@ export const useAppStore = defineStore('app', () => {
     selectedCity,
     currentWeather,
     forecast,
+    hourlyTemperatures,
     loading,
     lastUpdate,
     useMockData,

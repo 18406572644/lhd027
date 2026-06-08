@@ -1,10 +1,23 @@
 <template>
   <div class="forecast-panel" :class="{ 'dark-mode': isDark }">
-    <div class="panel-title">
-      <el-icon><Calendar /></el-icon>
-      <span>未来天气</span>
+    <div class="panel-header">
+      <div class="panel-title">
+        <el-icon><Calendar /></el-icon>
+        <span>未来天气</span>
+      </div>
+      <el-radio-group v-model="viewMode" size="small" class="view-switch">
+        <el-radio-button value="list">
+          <el-icon><List /></el-icon>
+          <span class="btn-text">列表</span>
+        </el-radio-button>
+        <el-radio-button value="chart">
+          <el-icon><DataLine /></el-icon>
+          <span class="btn-text">图表</span>
+        </el-radio-button>
+      </el-radio-group>
     </div>
-    <div class="forecast-list">
+    
+    <div class="forecast-list" v-show="viewMode === 'list'">
       <div 
         class="forecast-item" 
         v-for="(day, index) in appStore.forecast" 
@@ -20,16 +33,21 @@
         </div>
       </div>
     </div>
+    
+    <div class="chart-wrapper" v-show="viewMode === 'chart'">
+      <WeatherChart />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useAppStore } from '@/stores/app'
-
+import WeatherChart from './WeatherChart.vue'
 
 const appStore = useAppStore()
 const isDark = computed(() => appStore.isDark)
+const viewMode = ref<'list' | 'chart'>('chart')
 
 const getWeatherIcon = (weather: string): string => {
   const icons: Record<string, string> = {
@@ -57,17 +75,37 @@ const getWeatherIcon = (weather: string): string => {
   padding: 20px;
   backdrop-filter: blur(10px);
   
-  .panel-title {
+  .panel-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
-    font-size: 16px;
-    font-weight: 500;
-    color: #1e293b;
     margin-bottom: 16px;
     
-    .el-icon {
-      color: #667eea;
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #1e293b;
+      
+      .el-icon {
+        color: #667eea;
+      }
+    }
+    
+    .view-switch {
+      :deep(.el-radio-button__inner) {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 12px;
+        font-size: 13px;
+      }
+      
+      .btn-text {
+        margin-left: 2px;
+      }
     }
   }
   
@@ -75,6 +113,11 @@ const getWeatherIcon = (weather: string): string => {
     display: flex;
     justify-content: space-between;
     gap: 8px;
+  }
+  
+  .chart-wrapper {
+    width: 100%;
+    min-height: 340px;
   }
   
   .forecast-item {
@@ -130,11 +173,31 @@ const getWeatherIcon = (weather: string): string => {
   &.dark-mode {
     background: rgba(30, 41, 59, 0.7);
     
-    .panel-title {
-      color: #f1f5f9;
+    .panel-header {
+      .panel-title {
+        color: #f1f5f9;
+        
+        .el-icon {
+          color: #a5b4fc;
+        }
+      }
       
-      .el-icon {
-        color: #a5b4fc;
+      .view-switch {
+        :deep(.el-radio-button__inner) {
+          background: rgba(30, 41, 59, 0.5);
+          border-color: rgba(148, 163, 184, 0.2);
+          color: #94a3b8;
+          
+          &:hover {
+            color: #a5b4fc;
+          }
+        }
+        
+        :deep(.el-radio-button__orig-radio:checked + .el-radio-button__inner) {
+          background: #667eea;
+          border-color: #667eea;
+          color: #fff;
+        }
       }
     }
     

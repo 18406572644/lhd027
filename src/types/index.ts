@@ -28,11 +28,18 @@ export interface ForecastDay {
   nightwind: string
   daypower: string
   nightpower: string
+  precipitation?: string
+}
+
+export interface HourlyTemperature {
+  time: string
+  temperature: number
 }
 
 export interface WeatherData {
   current: CurrentWeather | null
   forecast: ForecastDay[]
+  hourlyTemperatures: HourlyTemperature[]
   lastUpdate: number
 }
 
