@@ -10,6 +10,7 @@ export const useAppStore = defineStore('app', () => {
   const forecast = ref<ForecastDay[]>([])
   const loading = ref(false)
   const lastUpdate = ref<number>(0)
+  const useMockData = ref(false)
   const themeMode = ref<ThemeMode>('light')
   const isDark = ref(false)
   const floatWindowEnabled = ref(false)
@@ -53,37 +54,81 @@ export const useAppStore = defineStore('app', () => {
 
   const fetchWeather = async () => {
     loading.value = true
+    let hasError = false
+    
     try {
-      const [currentRes, forecastRes] = await Promise.all([
-        axios.get(`${WEATHER_BASE_URL}/weatherInfo`, {
-          params: {
-            city: selectedCity.value.adcode,
-            key: WEATHER_KEY,
-            extensions: 'base'
+      const fetchCurrent = async () => {
+        try {
+          const res = await axios.get(`${WEATHER_BASE_URL}/weatherInfo`, {
+            params: {
+              city: selectedCity.value.adcode,
+              key: WEATHER_KEY,
+              extensions: 'base'
+            },
+            timeout: 8000
+          })
+          if (res.data.status === '1' && res.data.lives?.length > 0) {
+            return res.data.lives[0]
           }
-        }),
-        axios.get(`${WEATHER_BASE_URL}/weatherInfo`, {
-          params: {
-            city: selectedCity.value.adcode,
-            key: WEATHER_KEY,
-            extensions: 'all'
-          }
-        })
-      ])
-
-      if (currentRes.data.status === '1' && currentRes.data.lives?.length > 0) {
-        currentWeather.value = currentRes.data.lives[0]
+          console.warn('实时天气API返回业务错误:', res.data.info)
+          return null
+        } catch (e) {
+          console.error('实时天气请求失败:', e)
+          return null
+        }
       }
 
-      if (forecastRes.data.status === '1' && forecastRes.data.forecasts?.length > 0) {
-        forecast.value = forecastRes.data.forecasts[0].casts || []
+      const fetchForecast = async () => {
+        try {
+          const res = await axios.get(`${WEATHER_BASE_URL}/weatherInfo`, {
+            params: {
+              city: selectedCity.value.adcode,
+              key: WEATHER_KEY,
+              extensions: 'all'
+            },
+            timeout: 8000
+          })
+          if (res.data.status === '1' && res.data.forecasts?.length > 0) {
+            return res.data.forecasts[0].casts || []
+          }
+          console.warn('天气预报API返回业务错误:', res.data.info)
+          return null
+        } catch (e) {
+          console.error('天气预报请求失败:', e)
+          return null
+        }
+      }
+
+      const [currentData, forecastData] = await Promise.all([
+        fetchCurrent(),
+        fetchForecast()
+      ])
+
+      if (currentData) {
+        currentWeather.value = currentData
+      } else {
+        hasError = true
+        currentWeather.value = getMockCurrentWeather()
+      }
+
+      if (forecastData && forecastData.length > 0) {
+        forecast.value = forecastData
+      } else {
+        hasError = true
+        forecast.value = getMockForecast()
+      }
+
+      useMockData.value = hasError
+      if (hasError) {
+        console.log('已启用模拟天气数据（API请求失败或Key无效）')
       }
 
       lastUpdate.value = Date.now()
     } catch (error) {
-      console.error('获取天气数据失败:', error)
+      console.error('获取天气数据异常，启用模拟数据:', error)
       currentWeather.value = getMockCurrentWeather()
       forecast.value = getMockForecast()
+      useMockData.value = true
       lastUpdate.value = Date.now()
     } finally {
       loading.value = false
@@ -147,6 +192,7 @@ export const useAppStore = defineStore('app', () => {
     forecast,
     loading,
     lastUpdate,
+    useMockData,
     themeMode,
     isDark,
     floatWindowEnabled,

@@ -6,7 +6,11 @@
         <span>{{ appStore.selectedCity.name }}</span>
       </div>
       <div class="update-time" v-if="appStore.lastUpdate">
-        更新于 {{ formatTime(appStore.lastUpdate) }}
+        <span v-if="appStore.useMockData" class="mock-indicator" title="API请求失败，当前使用模拟数据">
+          <el-icon><Warning /></el-icon>
+          模拟数据
+        </span>
+        <span v-else>更新于 {{ formatTime(appStore.lastUpdate) }}</span>
       </div>
     </div>
 
@@ -103,6 +107,24 @@ const getWeatherIcon = (weather: string): string => {
     .update-time {
       font-size: 12px;
       color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      
+      .mock-indicator {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: #f59e0b;
+        background: rgba(245, 158, 11, 0.1);
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-weight: 500;
+        
+        .el-icon {
+          color: #f59e0b;
+        }
+      }
     }
   }
   
@@ -179,6 +201,15 @@ const getWeatherIcon = (weather: string): string => {
       
       .update-time {
         color: #64748b;
+        
+        .mock-indicator {
+          color: #fbbf24;
+          background: rgba(251, 191, 36, 0.15);
+          
+          .el-icon {
+            color: #fbbf24;
+          }
+        }
       }
     }
     
