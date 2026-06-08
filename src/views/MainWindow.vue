@@ -56,6 +56,9 @@
           <el-tab-pane label="闹钟" name="alarm">
             <AlarmPanel />
           </el-tab-pane>
+          <el-tab-pane label="专注" name="focus">
+            <FocusPanel />
+          </el-tab-pane>
           <el-tab-pane label="设置" name="settings">
             <SettingsPanel />
           </el-tab-pane>
@@ -101,6 +104,7 @@ import { useAppStore } from '@/stores/app'
 import { useAlarmStore } from '@/stores/alarm'
 import { useWidgetStore } from '@/stores/widget'
 import { useTodoStore } from '@/stores/todo'
+import { useFocusStore } from '@/stores/focus'
 import { appWindow } from '@tauri-apps/api/window'
 import { Grid, Collection, Refresh, Minus, Close, Plus } from '@element-plus/icons-vue'
 import type { Widget } from '@/types'
@@ -113,12 +117,14 @@ import AlarmPanel from '@/components/AlarmPanel.vue'
 import SettingsPanel from '@/components/SettingsPanel.vue'
 import WidgetContainer from '@/components/WidgetContainer.vue'
 import WidgetSettingsDialog from '@/components/WidgetSettingsDialog.vue'
+import FocusPanel from '@/components/FocusPanel.vue'
 
 const router = useRouter()
 const appStore = useAppStore()
 const alarmStore = useAlarmStore()
 const widgetStore = useWidgetStore()
 const todoStore = useTodoStore()
+const focusStore = useFocusStore()
 const isDark = computed(() => appStore.isDark)
 
 const activeTab = ref('alarm')
@@ -180,6 +186,7 @@ onMounted(() => {
   alarmStore.startChecking()
   widgetStore.loadWidgets()
   todoStore.loadTodos()
+  focusStore.loadAll()
   appStore.fetchWeather()
   
   setInterval(() => {

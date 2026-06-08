@@ -37,6 +37,30 @@ export const STORAGE_KEYS = {
   FLOAT_WINDOW: 'weather_clock_float_window',
   WIDGETS: 'weather_clock_widgets',
   TODOS: 'weather_clock_todos',
+  FOCUS: 'weather_clock_focus',
+  FOCUS_SESSIONS: 'weather_clock_focus_sessions',
+}
+
+export const DEFAULT_FOCUS_SETTINGS = {
+  pomodoroDuration: 25 * 60,
+  breakDuration: 5 * 60,
+  countdownDuration: 25 * 60,
+  autoStartBreak: false,
+  autoStartNextRound: false,
+}
+
+export const MAX_DURATION = 24 * 60 * 60
+export const MIN_DURATION = 60
+
+export const FOCUS_MODE_LABELS = {
+  pomodoro: '番茄钟',
+  countdown: '倒计时',
+  countup: '正计时',
+}
+
+export const FOCUS_PHASE_LABELS = {
+  focus: '专注中',
+  break: '休息中',
 }
 
 export const WIDGET_LIBRARY: WidgetLibraryItem[] = [

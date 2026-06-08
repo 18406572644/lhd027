@@ -108,3 +108,36 @@ export interface Todo {
   dueDate?: string
   priority: 'low' | 'medium' | 'high'
 }
+
+export type FocusMode = 'pomodoro' | 'countdown' | 'countup'
+export type FocusPhase = 'focus' | 'break'
+
+export interface FocusSettings {
+  pomodoroDuration: number
+  breakDuration: number
+  countdownDuration: number
+  autoStartBreak: boolean
+  autoStartNextRound: boolean
+}
+
+export interface FocusSession {
+  id: string
+  mode: FocusMode
+  phase: FocusPhase
+  startTime: number
+  endTime: number
+  duration: number
+  completed: boolean
+}
+
+export interface FocusState {
+  isRunning: boolean
+  isPaused: boolean
+  mode: FocusMode
+  phase: FocusPhase
+  remainingTime: number
+  elapsedTime: number
+  settings: FocusSettings
+  sessions: FocusSession[]
+  showFloatDuringFocus: boolean
+}

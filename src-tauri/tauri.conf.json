@@ -12,6 +12,10 @@
     "version": "1.0.0"
   },
   "tauri": {
+    "systemTray": {
+      "iconPath": "icons/icon.ico",
+      "iconAsTemplate": true
+    },
     "allowlist": {
       "all": false,
       "shell": {

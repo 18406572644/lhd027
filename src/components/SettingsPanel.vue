@@ -29,7 +29,7 @@
 
       <div class="setting-item">
         <div class="setting-info">
-          <el-icon><PictureInPicture /></el-icon>
+          <el-icon><Monitor /></el-icon>
           <div>
             <div class="setting-name">桌面悬浮窗</div>
             <div class="setting-desc">显示迷你悬浮时钟</div>
@@ -39,6 +39,21 @@
           v-model="localFloat" 
           size="small"
           @change="handleFloatChange"
+        />
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <el-icon><Timer /></el-icon>
+          <div>
+            <div class="setting-name">专注悬浮窗</div>
+            <div class="setting-desc">专注时悬浮窗显示剩余时间</div>
+          </div>
+        </div>
+        <el-switch 
+          v-model="localFocusFloat" 
+          size="small"
+          @change="handleFocusFloatChange"
         />
       </div>
 
@@ -76,15 +91,23 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useAppStore } from '@/stores/app'
+import { useFocusStore } from '@/stores/focus'
 import { invoke } from '@tauri-apps/api/tauri'
 import { ElMessage } from 'element-plus'
 import type { ThemeMode } from '@/types'
+import { 
+  Setting, Sunny, Moon, Aim, 
+  Monitor, Refresh, InfoFilled,
+  Timer
+} from '@element-plus/icons-vue'
 
 const appStore = useAppStore()
+const focusStore = useFocusStore()
 const isDark = computed(() => appStore.isDark)
 
 const localTheme = ref<ThemeMode>(appStore.themeMode)
 const localFloat = ref(appStore.floatWindowEnabled)
+const localFocusFloat = ref(focusStore.showFloatDuringFocus)
 
 watch(() => appStore.themeMode, (val) => {
   localTheme.value = val
@@ -92,6 +115,10 @@ watch(() => appStore.themeMode, (val) => {
 
 watch(() => appStore.floatWindowEnabled, (val) => {
   localFloat.value = val
+})
+
+watch(() => focusStore.showFloatDuringFocus, (val) => {
+  localFocusFloat.value = val
 })
 
 const handleThemeChange = (val: ThemeMode) => {
@@ -113,6 +140,11 @@ const handleFloatChange = async (val: boolean) => {
     localFloat.value = !val
     ElMessage.error('操作失败，请在Tauri环境中运行')
   }
+}
+
+const handleFocusFloatChange = (val: boolean) => {
+  focusStore.setShowFloatDuringFocus(val)
+  ElMessage.success(val ? '专注时悬浮窗已开启' : '专注时悬浮窗已关闭')
 }
 </script>
 
