@@ -281,12 +281,15 @@ onMounted(() => {
   .app-main {
     flex: 1;
     padding: 20px;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     position: relative;
+    min-height: 0;
     
     .main-content {
-      height: 100%;
-      overflow-y: auto;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
     }
     
     .widgets-area {

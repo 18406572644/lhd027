@@ -340,6 +340,8 @@ const handleStop = () => {
   padding: 20px;
   margin-top: 20px;
   backdrop-filter: blur(10px);
+  width: 100%;
+  box-sizing: border-box;
   
   .panel-header {
     margin-bottom: 20px;

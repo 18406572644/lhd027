@@ -282,7 +282,8 @@ const avgDailyMinutes = computed(() => {
   border-radius: 16px;
   padding: 20px;
   margin-top: 16px;
-  overflow-x: auto;
+  width: 100%;
+  box-sizing: border-box;
   
   .heatmap-header {
     display: flex;
@@ -330,13 +331,16 @@ const avgDailyMinutes = computed(() => {
   }
   
   .heatmap-container {
-    min-width: 600px;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
     
     .heatmap-months {
       position: relative;
       height: 20px;
       margin-left: 30px;
       margin-bottom: 4px;
+      min-width: fit-content;
       
       .month-label {
         position: absolute;
@@ -367,6 +371,7 @@ const avgDailyMinutes = computed(() => {
       .heatmap-cells {
         display: flex;
         gap: 3px;
+        min-width: fit-content;
         
         .heatmap-week {
           display: flex;

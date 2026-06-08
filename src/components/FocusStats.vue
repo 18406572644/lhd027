@@ -166,6 +166,8 @@ const handleClearHistory = async () => {
   border-radius: 16px;
   padding: 20px;
   margin-top: 16px;
+  width: 100%;
+  box-sizing: border-box;
   
   .stats-header {
     display: flex;
