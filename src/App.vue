@@ -5,8 +5,10 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useAppStore } from '@/stores/app'
+import { useThemeStore } from '@/stores/theme'
 
 const appStore = useAppStore()
+const themeStore = useThemeStore()
 
 onMounted(() => {
   if (window.location.hash.includes('#/float')) {
@@ -14,6 +16,7 @@ onMounted(() => {
   }
   
   appStore.applyTheme()
+  themeStore.loadFromStorage()
 })
 </script>
 

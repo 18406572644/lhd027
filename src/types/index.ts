@@ -55,6 +55,101 @@ export interface Alarm {
 
 export type ThemeMode = 'light' | 'dark' | 'auto'
 
+export interface ThemeColors {
+  primary: string
+  secondary: string
+  accent: string
+  gradientStart: string
+  gradientEnd: string
+  background: string
+  surface: string
+  textPrimary: string
+  textSecondary: string
+  border: string
+  success: string
+  warning: string
+  error: string
+  info: string
+}
+
+export interface ThemeConfig {
+  id: string
+  name: string
+  description: string
+  author: string
+  version: string
+  createdAt: number
+  updatedAt?: number
+  thumbnail?: string
+  isPreset: boolean
+  isFavorite: boolean
+  colors: ThemeColors
+  backgroundImage?: string
+  cardOpacity: number
+  borderRadius: number
+  fontFamily: string
+  shadowIntensity: number
+  mode: 'light' | 'dark'
+  tags: string[]
+  downloadCount?: number
+  rating?: number
+  ratingCount?: number
+}
+
+export interface ThemeMarketItem extends ThemeConfig {
+  authorId: string
+  authorName: string
+  authorAvatar?: string
+  downloadCount: number
+  rating: number
+  ratingCount: number
+  comments: ThemeComment[]
+  uploadedAt: number
+  category: string
+  status: 'pending' | 'approved' | 'rejected'
+}
+
+export interface ThemeComment {
+  id: string
+  userId: string
+  userName: string
+  userAvatar?: string
+  content: string
+  rating: number
+  createdAt: number
+  likes: number
+}
+
+export interface DynamicThemeConfig {
+  enabled: boolean
+  sunRiseSunSet: boolean
+  weatherBased: boolean
+  autoSwitchInterval: number
+}
+
+export interface HolidayTheme {
+  id: string
+  name: string
+  holiday: string
+  startDate: string
+  endDate: string
+  theme: ThemeConfig
+  isActive: boolean
+}
+
+export type WeatherCondition = 'sunny' | 'cloudy' | 'rainy' | 'snowy' | 'windy' | 'foggy' | 'thunderstorm'
+
+export interface SunriseSunsetTimes {
+  sunrise: string
+  sunset: string
+}
+
+export interface ThemeExportData {
+  version: string
+  exportedAt: number
+  theme: ThemeConfig
+}
+
 export type WidgetType = 'clock' | 'weather' | 'alarm' | 'todo' | 'calendar'
 
 export type ClockMode = 'digital' | 'analog'

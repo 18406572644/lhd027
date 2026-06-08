@@ -39,6 +39,12 @@ export const STORAGE_KEYS = {
   TODOS: 'weather_clock_todos',
   FOCUS: 'weather_clock_focus',
   FOCUS_SESSIONS: 'weather_clock_focus_sessions',
+  CURRENT_THEME: 'weather_clock_current_theme',
+  CUSTOM_THEMES: 'weather_clock_custom_themes',
+  FAVORITE_THEMES: 'weather_clock_favorite_themes',
+  THEME_MARKET: 'weather_clock_theme_market',
+  DYNAMIC_THEME_CONFIG: 'weather_clock_dynamic_theme_config',
+  USER_RATINGS: 'weather_clock_user_ratings',
 }
 
 export const DEFAULT_FOCUS_SETTINGS = {
